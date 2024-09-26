@@ -1,167 +1,96 @@
 <template>
-    <div>
-        <h1>ToDo App</h1>
-        <form @submit.prevent="addTodo()">
-            <label>New ToDo </label>
-            <input v-model="newTodo" name="newTodo" autocomplete="off" />
-            <button>Add ToDo</button>
-        </form>
-        <h2>ToDo List</h2>
-        <ul>
-            <li v-for="(todo, index) in defaultData" :key="index">
-                <span :class="{ done: todo.done }" @click="doneTodo(todo)">{{ todo.content }}</span>
-                <button @click="removeTodo(index)">Remove</button>
-            </li>
-        </ul>
-        <h4 v-if="defaultData.length === 0">Empty list.</h4>
+    <div class="w-full h-screen bg-gray-200 pt-8 flex justify-center items-center">
+        <div class="bg-white p-5 max-w-md mx-auto container">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold">ToDo App</h1>
+                <div class="mt-4 flex">
+                    <input class="w-80 border-b-2 border-gray-500 text-black" type="text" placeholder="Enter your task here" v-model="newTodo" name="newTodo"/>
+                    <button @click="addTodo()" class="ml-2 border-2 border-green-500 p-2 text-green-500 hover:text-white hover:bg-green-500 rounded-lg flex">   
+                        Add
+                    </button>
+                </div>        
+            </div>
+            <div class="mt-8">
+                <ul>
+                    <li class="p-2 rounded-lg" v-for="(todo, index) in defaultData" :key="index">
+                        <div class="flex align-middle flex-row justify-between">
+                            <div class="p-2">
+                                <input type="checkbox" class="h-6 w-6 " :checked="todo.done" @click="toggleTodoStatus(todo)" />
+                            </div>
+                            <div class="p-2">
+                                <p class="text-lg" :class="{ done: todo.done }">{{ todo.content }}</p>
+                            </div>
+                            <button class="flex text-red-700 border-2 border-red-500 p-2 rounded-lg" @click="removeTodo(index)">
+                                Remove
+                            </button>
+                        </div>
+                        <hr class="mt-2"/>
+                    </li>
+                </ul>
+            </div>
+            <div class="mt-8">
+                <button class="border-2 border-red-500 p-2 text-red-700" @click="clearCompleteTask()">Clear Completed Task</button>
+                <button class="border-2 border-indigo-500 p-2 text-indigo-500 ml-4" @click="resetTodoList()">Reset Todo List</button>
+            </div>
+        </div>    
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            newTodo : '',
-            defaultData: [
-                {
-                    done: true,
-                    content: 'Training NuxtJS'
-                },
-                {
-                    done: false,
-                    content: 'Training Laravel'
-                }
-            ],
-        }
-    },
+<script setup lang="ts">
+    interface Todo {
+        done: Boolean
+        content: String
+    }
 
-    methods: {
-        addTodo() {
-            const todos = {}
-            if (this.newTodo) {
-                todos['done'] = false
-                todos['content'] = this.newTodo
-                this.newTodo = ''
-            }
-            this.defaultData.push(todos)
+    let newTodo = ref('')
+    let defaultData= ref<Todo[]>(
+        [{
+            done: false,
+            content: 'Training NuxtJS'
         },
+        {
+            done: false,
+            content: 'Training Laravel'
+        }]);
 
-        doneTodo(todo) {
-            todo.done = !todo.done
-        },
-
-        removeTodo(index) {
-            this.defaultData.splice(index, 1)
-        }
-    },
-}
-
-</script>
-
-<style lang="scss">
-    $border: 2px solid
-
-    rgba(
-        $color: white,
-        $alpha: 0.35
-    );
-
-    $size1: 6px;
-    $size2: 12px;
-    $size3: 18px;
-    $size4: 24px;
-    $size5: 48px;
-    $backgroundColor: #27292d;
-    $textColor: white;
-    $primaryColor: #a0a4d9;
-    $secondTextColor: #1f2023;
-
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Avenir, Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: $backgroundColor;
-        color: $textColor;
-
-    #__nuxt {
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 20px;
-        h1 {
-        font-weight: bold;
-        font-size: 28px;
-        text-align: center;
-        }
-        form {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        label {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        input,
-        button {
-            height: $size5;
-            box-shadow: none;
-            outline: none;
-            padding-left: $size2;
-            padding-right: $size2;
-            border-radius: $size1;
-            font-size: 18px;
-            margin-top: $size1;
-            margin-bottom: $size2;
-        }
-        input {
-            background-color: transparent;
-            border: $border;
-            color: inherit;
-        }
-        }
-        button {
-        cursor: pointer;
-        background-color: $primaryColor;
-        border: 1px solid $primaryColor;
-        color: $secondTextColor;
-        font-weight: bold;
-        outline: none;
-        border-radius: $size1;
-        }
-        h2 {
-        font-size: 22px;
-        border-bottom: $border;
-        padding-bottom: $size1;
-        }
-        ul {
-        padding: 10px;
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: $border;
-            padding: $size2 $size4;
-            border-radius: $size1;
-            margin-bottom: $size2;
-            span {
-            cursor: pointer;
-            }
-            .done {
-            text-decoration: line-through;
-            }
-            button {
-            font-size: $size2;
-            padding: $size1;
-            }
-        }
-        }
-        h4 {
-        text-align: center;
-        opacity: 0.5;
-        margin: 0;
+    function addTodo() {
+        if (newTodo.value) {  
+            defaultData.value = [...defaultData.value, {  
+                done: false,  
+                content: newTodo.value  
+            }];  
+            newTodo.value = '';  
         }
     }
+
+    function toggleTodoStatus(todo: Todo) { 
+        todo.done = !todo.done;        
+    }
+    
+    function removeTodo(index: number) {
+        defaultData.value.splice(index, 1);
+    }
+
+    function clearCompleteTask() {
+        defaultData.value = defaultData.value.filter((todo: Todo) => todo.done !== true);
+    }
+
+    function resetTodoList() {
+        defaultData.value = [];
+    }
+</script>
+
+<style>
+.done {
+    text-decoration: line-through;
+    color: rgb(172, 170, 170);
+}
+
+.container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 90%;
 }
 </style>
